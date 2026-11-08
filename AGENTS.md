@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 Convenciones de este proyecto (Spring Boot + H2 + JPA).
 
@@ -84,10 +84,10 @@ Patrón para poder tener datos de prueba sin depender de la base real:
 
 ## Configuración
 
-- `application.properties`: solo `spring.application.name` y `spring.profiles.active`.
-- Un `application-<profile>.properties` por entorno (`local`, `prod`), con la config de
-  datasource/H2/JPA de ese entorno. `local` usa H2 con `create-drop` y consola habilitada;
-  `prod` usa `update` y consola deshabilitada.
+- pplication.yml: spring.application.name, spring.profiles.active y configuración base para H2.
+- Un pplication-<profile>.yml por entorno (local, postgres, prod), con la config de
+  datasource/JPA de ese entorno. local usa H2 con create-drop y consola habilitada;
+  postgres/prod usan PostgreSQL con update y consola deshabilitada.
 - Datos de prueba vía `data.sql` (`spring.sql.init.mode=always` +
   `spring.jpa.defer-datasource-initialization=true` en `local`) cuando haga falta semilla.
 
