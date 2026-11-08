@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: tp
+  profiles:
+    active: local
+
+  datasource:
+    url: jdbc:h2:mem:tp
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ''
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always

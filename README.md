@@ -1,4 +1,4 @@
-# Nombre Equipo
+﻿# Nombre Equipo
 
 Integrantes
 
@@ -12,13 +12,14 @@ nombre user_git
 
 ```
 src/main/java/ar/edu/unsam/ddso/tp/
-└── TpApplication.java          # entry point
+└── ArchivoDigitalApplication.java          # entry point
 src/main/resources/
-├── application.properties        # nombre de la app + perfil activo
-├── application-local.properties  # H2 + JPA para desarrollo local
-└── application-prod.properties   # H2 + JPA para "prod"
+├── application.yml             # nombre de la app + perfil activo + config base H2
+├── application-local.yml       # H2 + JPA para desarrollo local
+├── application-postgres.yml    # PostgreSQL + JPA
+└── application-prod.yml        # PostgreSQL para producción
 src/test/java/ar/edu/unsam/ddso/tp/
-└── TpApplicationTests.java       # smoke test (contextLoads)
+└── ArchivoDigitalApplicationTests.java       # smoke test (contextLoads)
 ```
 
 ## Cómo correr los tests
