@@ -14,7 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Label used to catalog digitizations; managed at runtime. */
+/** Etiqueta usada para catalogar digitalizaciones; gestionable en tiempo de ejecucion. */
 @Entity
 @Table(name = "tags")
 @Getter
@@ -28,8 +28,8 @@ public class Tag {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String name;
+    private String nombre;
 
     @ManyToMany(mappedBy = "tags")
-    private Set<Digitization> digitizations = new HashSet<>();
+    private Set<Digitalizacion> digitalizaciones = new HashSet<>();
 }

@@ -19,48 +19,48 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Digital resource (scan, photo, etc.) generated from a physical piece. */
+/** Recurso digital (escaneo, foto, etc.) generado a partir de una pieza fisica. */
 @Entity
-@Table(name = "digitizations")
+@Table(name = "digitalizaciones")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Digitization {
+public class Digitalizacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 500)
-    private String resourceUrl;
+    private String urlRecurso;
 
     @Column(columnDefinition = "TEXT")
-    private String description;
+    private String descripcion;
 
     @Column(nullable = false)
-    private LocalDateTime digitizationDate;
+    private LocalDateTime fechaDigitalizacion;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "physical_piece_id", nullable = false)
-    private PhysicalPiece physicalPiece;
+    @JoinColumn(name = "pieza_fisica_id", nullable = false)
+    private PiezaFisica piezaFisica;
 
     @ManyToMany
     @JoinTable(
-            name = "digitization_tags",
-            joinColumns = @JoinColumn(name = "digitization_id"),
+            name = "digitalizacion_tag",
+            joinColumns = @JoinColumn(name = "digitalizacion_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
 
-    /** Associates a tag with this digitization, keeping both sides of the relation in sync. */
-    public void addTag(Tag tag) {
+    /** Asocia un tag a esta digitalizacion manteniendo ambos lados sincronizados. */
+    public void asociarTag(Tag tag) {
         tags.add(tag);
-        tag.getDigitizations().add(this);
+        tag.getDigitalizaciones().add(this);
     }
 
-    /** Dissociates a tag from this digitization, keeping both sides of the relation in sync. */
-    public void removeTag(Tag tag) {
+    /** Desasocia un tag de esta digitalizacion manteniendo ambos lados sincronizados. */
+    public void desasociarTag(Tag tag) {
         tags.remove(tag);
-        tag.getDigitizations().remove(this);
+        tag.getDigitalizaciones().remove(this);
     }
 }
