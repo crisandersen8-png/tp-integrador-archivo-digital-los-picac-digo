@@ -88,8 +88,7 @@ Todas las respuestas de error retornan un payload con la siguiente estructura:
 ### 5.4. Módulo de Disponibilización (Búsquedas para Bot de Telegram y Clientes)
 | Método | Endpoint | Descripción | Parámetros Query | Response DTO | Código |
 |---|---|---|---|---|---|
-| `GET` | `/api/v1/digitalizaciones` | Buscar digitalizaciones por tag | `?tag=FOTOGRAFIA` | `List<DigitalizacionResponseDTO>` | 200 |
-| `GET` | `/api/v1/piezas-fisicas/buscar` | Buscar piezas por nombre o código | `?q=acta` | `List<PiezaFisicaResponseDTO>` | 200 |
+| `GET` | `/api/v1/piezas-fisicas/buscar` | Buscar piezas físicas paginadas (por término, fechas y tag de sus digitalizaciones) | `?termino=acta&fechaDesde=2026-01-01&fechaHasta=2026-12-31&tag=FOTOGRAFIA&page=0&size=10` | `Page<PiezaFisicaResponseDTO>` | 200 |
 
 ---
 
@@ -238,25 +237,31 @@ Todas las respuestas de error retornan un payload con la siguiente estructura:
 
 ---
 
-### 6.6. Búsqueda de Digitalizaciones por Tag (Consumo Bot de Telegram)
+### 6.6. Búsqueda Avanzada Paginada de Piezas Físicas (Consumo Bot de Telegram y Clientes)
 
-- **Endpoint:** `GET /api/v1/digitalizaciones?tag=FOTOGRAFIA`
-- **Descripción:** Utilizado por el bot de Telegram para disponibilizar recursos digitales categorizados con una etiqueta específica.
+- **Endpoint:** `GET /api/v1/piezas-fisicas/buscar?termino=acta&tag=FOTOGRAFIA&page=0&size=10`
+- **Descripción:** Permite buscar piezas físicas combinando filtros opcionales por término libre (nombre, descripción o código de inventario), rango de fecha de ingreso (`fechaDesde`, `fechaHasta`) y nombre de etiqueta (`tag`) asociada a sus digitalizaciones, retornando una respuesta paginada apta para gran volumen de datos.
 
-#### Response Body (`200 OK` - `List<DigitalizacionResponseDTO>`):
+#### Response Body (`200 OK` - `Page<PiezaFisicaResponseDTO>`):
 ```json
-[
-  {
-    "id": 11,
-    "piezaFisicaId": 1,
-    "urlRecurso": "https://storage.archivo-digital.org/fondos/inv-0042-fotografia.jpg",
-    "descripcion": "Toma fotográfica de dorso del documento",
-    "fechaDigitalizacion": "2026-04-02T10:15:00",
-    "tags": [
-      { "id": 4, "nombre": "FOTOGRAFIA" },
-      { "id": 5, "nombre": "DORSO" },
-      { "id": 7, "nombre": "RESTAURADO" }
-    ]
-  }
-]
+{
+  "content": [
+    {
+      "id": 1,
+      "codigoInventario": "INV-2026-0042",
+      "nombre": "Acta Fundacional del Instituto",
+      "descripcion": "Manuscrito en papel de lino con firmas de miembros fundadores",
+      "fechaIngreso": "2026-03-15",
+      "tipoMaterial": "Documento Papel",
+      "cantidadDigitalizaciones": 2
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 10
+  },
+  "totalElements": 1,
+  "totalPages": 1,
+  "last": true
+}
 ```
