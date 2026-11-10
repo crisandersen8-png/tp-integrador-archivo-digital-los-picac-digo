@@ -22,23 +22,23 @@ El proyecto adopta una pirámide de pruebas centrada en pruebas unitarias rápid
 
 ## 2. Convenciones de Código de Pruebas
 
-- **Lenguaje:** Nombres de clases, métodos, variables y aserciones en **inglés**.
-- **Estructura Given-When-Then:** Cada test debe estar segmentado con comentarios explícitos:
+- **Lenguaje:** Nombres de clases, métodos, variables y mensajes en **español**, sin tildes ni `ñ` (ver `AGENTS.md`).
+- **Estructura Dado-Cuando-Entonces (Given-When-Then):** Cada test debe estar segmentado con comentarios explícitos:
   ```java
   @Test
-  void createResource_validInput_returnsCreatedResource() {
-      // Given
-      ResourceRequestDTO request = new ResourceRequestDTO("Nombre", "Descripcion");
-      when(repository.save(any(Resource.class))).thenReturn(new Resource(1L, "Nombre", "Descripcion"));
+  void crearRecurso_datosValidos_devuelveRecursoCreado() {
+      // Dado
+      RecursoRequestDTO request = new RecursoRequestDTO("Nombre", "Descripcion");
+      when(repository.save(any(Recurso.class))).thenReturn(new Recurso(1L, "Nombre", "Descripcion"));
 
-      // When
-      ResourceResponseDTO response = service.create(request);
+      // Cuando
+      RecursoResponseDTO respuesta = service.crear(request);
 
-      // Then
-      assertNotNull(response);
-      assertEquals(1L, response.id());
-      assertEquals("Nombre", response.nombre());
-      verify(repository, times(1)).save(any(Resource.class));
+      // Entonces
+      assertNotNull(respuesta);
+      assertEquals(1L, respuesta.id());
+      assertEquals("Nombre", respuesta.nombre());
+      verify(repository, times(1)).save(any(Recurso.class));
   }
   ```
 - **Nomenclatura de Métodos de Test:**

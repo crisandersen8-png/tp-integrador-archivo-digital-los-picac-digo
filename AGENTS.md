@@ -96,8 +96,8 @@ Patrón para poder tener datos de prueba sin depender de la base real:
 - Unitarios con JUnit 5 + Mockito, sin levantar contexto de Spring:
   - `@ExtendWith(MockitoExtension.class)`, `@Mock` para los repositorios, se instancia el
     `service`/entidad a mano.
-  - Comentarios `// Given`, `// When`, `// Then` para marcar las secciones del test (en inglés,
-    como el resto del código).
+  - Comentarios `// Dado`, `// Cuando`, `// Entonces` para marcar las secciones del test (en
+    español, como el resto del código).
   - `assertEquals`, `assertThrows` de `org.junit.jupiter.api.Assertions` (import estático).
 - `XxxApplicationTests` con `@SpringBootTest` y un `contextLoads()` vacío como smoke test.
 - Tests de entidades (reglas de negocio) separados de tests de service (orquestación).
@@ -114,9 +114,13 @@ Patrón para poder tener datos de prueba sin depender de la base real:
   columnas, no obliga `final` en parámetros): solo chequea imports, naming, buenas prácticas
   básicas (`EqualsHashCode`, `NeedBraces`, `HiddenField` con excepciones para constructor/setter).
   No endurecerlo sin que lo pida el usuario.
-- **Todo el código va en inglés**: clases, campos,
-  métodos, comentarios, mensajes de excepción, nombres de test. La documentación (este archivo,
-  `README.md`, `ARCHITECTURE.md`, `spec.md`/`plan.md`) se mantiene en español.
+- **Todo el código va en español, sin tildes ni caracteres especiales** (no usar `á`, `é`, `í`,
+  `ó`, `ú`, `ü` ni `ñ`; ej. `descripcion`, `digitalizacion`, `anio`): clases, atributos, métodos,
+  comentarios, mensajes de error/excepción y tests (nombres y contenido). Los nombres de
+  entidades, atributos y tablas deben coincidir 1:1 con `docs/diagramas/clases.md` y
+  `docs/diagramas/der.md`. Las palabras clave de Java, anotaciones y APIs de librerías quedan como
+  están. La documentación (este archivo, `README.md`, `ARCHITECTURE.md`, `spec.md`/`plan.md`)
+  también se mantiene en español.
 - Imports: sin wildcard imports en código de producción (sí se usa `import static ... *` en
   tests para `Mockito`/`Assertions`).
 
