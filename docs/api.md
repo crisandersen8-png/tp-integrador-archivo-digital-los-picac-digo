@@ -108,6 +108,7 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
   "descripcion": "Manuscrito en papel de lino con firmas de miembros fundadores",
   "fechaIngreso": "2026-03-15",
   "tipoMaterial": "Documento Papel",
+  "estado": "EN_DEPOSITO",
   "cantidadDigitalizaciones": 0
 }
 ```
@@ -128,13 +129,19 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
   "descripcion": "Manuscrito en papel de lino con firmas de miembros fundadores",
   "fechaIngreso": "2026-03-15",
   "tipoMaterial": "Documento Papel",
+  "estado": "EN_DEPOSITO",
   "digitalizaciones": [
     {
       "id": 10,
+      "piezaFisicaId": 1,
       "urlRecurso": "https://storage.archivo-digital.org/fondos/inv-0042-scan-hi.pdf",
       "descripcion": "Escaneo color alta resolución 600 DPI",
       "fechaDigitalizacion": "2026-04-01T14:30:00",
-      "tags": ["MANUSCRITO", "SIGLO_XX", "ACTA"]
+      "tags": [
+        { "id": 1, "nombre": "MANUSCRITO" },
+        { "id": 2, "nombre": "SIGLO_XX" },
+        { "id": 3, "nombre": "ACTA" }
+      ]
     }
   ]
 }
@@ -151,9 +158,7 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
 ```json
 {
   "urlRecurso": "https://storage.archivo-digital.org/fondos/inv-0042-fotografia.jpg",
-  "descripcion": "Toma fotográfica de dorso del documento",
-  "fechaDigitalizacion": "2026-04-02T10:15:00",
-  "tags": ["FOTOGRAFIA", "DORSO"]
+  "descripcion": "Toma fotográfica de dorso del documento"
 }
 ```
 
@@ -165,10 +170,7 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
   "urlRecurso": "https://storage.archivo-digital.org/fondos/inv-0042-fotografia.jpg",
   "descripcion": "Toma fotográfica de dorso del documento",
   "fechaDigitalizacion": "2026-04-02T10:15:00",
-  "tags": [
-    { "id": 4, "nombre": "FOTOGRAFIA" },
-    { "id": 5, "nombre": "DORSO" }
-  ]
+  "tags": []
 }
 ```
 

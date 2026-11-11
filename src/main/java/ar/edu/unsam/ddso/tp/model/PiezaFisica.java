@@ -81,7 +81,7 @@ public class PiezaFisica {
     /** Crea una digitalizacion de esta pieza y la vincula manteniendo ambos lados sincronizados. */
     public Digitalizacion agregarDigitalizacion(String url, String descripcionDigitalizacion) {
         Digitalizacion digitalizacion = new Digitalizacion();
-        digitalizacion.setUrlRecurso(url);
+        digitalizacion.setUrlRecurso(url != null ? url.trim() : null);
         digitalizacion.setDescripcion(descripcionDigitalizacion);
         digitalizacion.setFechaDigitalizacion(LocalDateTime.now());
         digitalizacion.validar();

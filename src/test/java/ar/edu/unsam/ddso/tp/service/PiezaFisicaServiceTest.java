@@ -54,7 +54,8 @@ class PiezaFisicaServiceTest {
                         LocalDate.of(2026, 3, 15),
                         "Documento Papel",
                         EstadoPieza.EN_DEPOSITO);
-        when(piezaFisicaRepository.existsByCodigoInventario("INV-2026-0042")).thenReturn(false);
+        when(piezaFisicaRepository.existsByCodigoInventarioIgnoreCase("INV-2026-0042"))
+                .thenReturn(false);
         when(piezaFisicaRepository.save(any(PiezaFisica.class)))
                 .thenAnswer(
                         invocacion -> {
@@ -86,7 +87,8 @@ class PiezaFisicaServiceTest {
                         LocalDate.of(2026, 3, 15),
                         "Documento Papel",
                         null);
-        when(piezaFisicaRepository.existsByCodigoInventario("INV-2026-0042")).thenReturn(true);
+        when(piezaFisicaRepository.existsByCodigoInventarioIgnoreCase("INV-2026-0042"))
+                .thenReturn(true);
 
         // Cuando / Entonces
         assertThrows(

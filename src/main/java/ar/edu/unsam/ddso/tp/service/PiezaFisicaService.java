@@ -47,17 +47,19 @@ public class PiezaFisicaService {
     @Transactional
     public PiezaFisicaResponseDTO crearPieza(PiezaFisicaCreateRequestDTO request) {
         PiezaFisica pieza = new PiezaFisica();
-        pieza.setCodigoInventario(request.codigoInventario());
-        pieza.setNombre(request.nombre());
+        pieza.setCodigoInventario(
+                request.codigoInventario() != null ? request.codigoInventario().trim() : null);
+        pieza.setNombre(request.nombre() != null ? request.nombre().trim() : null);
         pieza.setDescripcion(request.descripcion());
         pieza.setFechaIngreso(request.fechaIngreso());
-        pieza.setTipoMaterial(request.tipoMaterial());
+        pieza.setTipoMaterial(
+                request.tipoMaterial() != null ? request.tipoMaterial().trim() : null);
         if (request.estado() != null) {
             pieza.setEstado(request.estado());
         }
         pieza.validar();
 
-        if (piezaFisicaRepository.existsByCodigoInventario(pieza.getCodigoInventario())) {
+        if (piezaFisicaRepository.existsByCodigoInventarioIgnoreCase(pieza.getCodigoInventario())) {
             throw new CodigoInventarioDuplicadoException(pieza.getCodigoInventario());
         }
 

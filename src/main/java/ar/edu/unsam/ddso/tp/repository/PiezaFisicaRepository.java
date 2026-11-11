@@ -16,6 +16,8 @@ public interface PiezaFisicaRepository
 
     boolean existsByCodigoInventario(String codigoInventario);
 
+    boolean existsByCodigoInventarioIgnoreCase(String codigoInventario);
+
     /**
      * Busqueda avanzada paginada cruzando PiezaFisica, Digitalizacion y Tag con filtros opcionales
      * por termino (nombre, descripcion o codigo de inventario), rango de fecha de ingreso y tag.
