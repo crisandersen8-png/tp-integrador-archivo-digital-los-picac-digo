@@ -1,5 +1,6 @@
 package ar.edu.unsam.ddso.tp.model;
 
+import ar.edu.unsam.ddso.tp.model.exceptions.TagInvalidoException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,4 +33,11 @@ public class Tag {
 
     @ManyToMany(mappedBy = "tags")
     private Set<Digitalizacion> digitalizaciones = new HashSet<>();
+
+    /** Valida las invariantes de negocio obligatorias del tag. */
+    public void validar() {
+        if (nombre == null || nombre.isBlank()) {
+            throw new TagInvalidoException("El nombre del tag es obligatorio");
+        }
+    }
 }
