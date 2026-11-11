@@ -6,6 +6,7 @@ import ar.edu.unsam.ddso.tp.dto.PiezaFisicaCreateRequestDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaDetalleResponseDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
 import ar.edu.unsam.ddso.tp.service.PiezaFisicaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Controlador REST para el alta de piezas fisicas y asociacion de digitalizaciones. */
 @RestController
-@RequestMapping({"/api/v1/piezas-fisicas", "/api/piezas"})
+@RequestMapping("/api/v1/piezas-fisicas")
 public class PiezaFisicaController {
 
     private final PiezaFisicaService piezaFisicaService;
@@ -28,7 +29,7 @@ public class PiezaFisicaController {
 
     @PostMapping
     public ResponseEntity<PiezaFisicaResponseDTO> crearPieza(
-            @RequestBody PiezaFisicaCreateRequestDTO request) {
+            @Valid @RequestBody PiezaFisicaCreateRequestDTO request) {
         PiezaFisicaResponseDTO creada = piezaFisicaService.crearPieza(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(creada);
     }
@@ -40,7 +41,7 @@ public class PiezaFisicaController {
 
     @PostMapping("/{id}/digitalizaciones")
     public ResponseEntity<DigitalizacionResponseDTO> agregarDigitalizacion(
-            @PathVariable Long id, @RequestBody DigitalizacionCreateRequestDTO request) {
+            @PathVariable Long id, @Valid @RequestBody DigitalizacionCreateRequestDTO request) {
         DigitalizacionResponseDTO creada = piezaFisicaService.agregarDigitalizacion(id, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(creada);
     }

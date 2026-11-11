@@ -6,8 +6,4 @@ public class PiezaFisicaNoEncontradaException extends RuntimeException {
     public PiezaFisicaNoEncontradaException(Long id) {
         super("Pieza fisica con ID " + id + " no encontrada");
     }
-
-    public PiezaFisicaNoEncontradaException(String mensaje) {
-        super(mensaje);
-    }
 }

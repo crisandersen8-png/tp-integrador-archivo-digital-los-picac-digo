@@ -51,12 +51,12 @@ public class PiezaFisica {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private EstadoPieza estado;
+    private EstadoPieza estado = EstadoPieza.EN_DEPOSITO;
 
     @OneToMany(mappedBy = "piezaFisica", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Digitalizacion> digitalizaciones = new ArrayList<>();
 
-    /** Valida las invariantes de negocio obligatorias de la pieza fisica. */
+    /** Valida las invariantes de negocio obligatorias de la pieza fisica sin mutar su estado. */
     public void validar() {
         if (codigoInventario == null || codigoInventario.isBlank()) {
             throw new PiezaFisicaInvalidaException("El codigo de inventario es obligatorio");
@@ -73,7 +73,8 @@ public class PiezaFisica {
                     "El tipo de material de la pieza fisica es obligatorio");
         }
         if (estado == null) {
-            estado = EstadoPieza.EN_DEPOSITO;
+            throw new PiezaFisicaInvalidaException(
+                    "El estado de la pieza fisica es obligatorio");
         }
     }
 

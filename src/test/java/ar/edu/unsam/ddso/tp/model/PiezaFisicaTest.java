@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class PiezaFisicaTest {
 
     @Test
-    void validarPiezaConDatosObligatoriosAsignaEstadoPorDefecto() {
+    void validarPiezaConDatosObligatoriosMantieneEstadoPorDefectoEnDeposito() {
         // Dado
         PiezaFisica pieza = new PiezaFisica();
         pieza.setCodigoInventario("INV-2026-0001");
@@ -21,7 +21,7 @@ class PiezaFisicaTest {
         pieza.validar();
 
         // Entonces
-        assertNotNull(pieza.getEstado());
+        assertEquals(ar.edu.unsam.ddso.tp.model.enums.EstadoPieza.EN_DEPOSITO, pieza.getEstado());
     }
 
     @Test

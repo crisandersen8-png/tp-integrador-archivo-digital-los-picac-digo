@@ -11,7 +11,6 @@ import ar.edu.unsam.ddso.tp.exception.PiezaFisicaNoEncontradaException;
 import ar.edu.unsam.ddso.tp.model.Digitalizacion;
 import ar.edu.unsam.ddso.tp.model.PiezaFisica;
 import ar.edu.unsam.ddso.tp.model.Tag;
-import ar.edu.unsam.ddso.tp.model.enums.EstadoPieza;
 import ar.edu.unsam.ddso.tp.repository.DigitalizacionRepository;
 import ar.edu.unsam.ddso.tp.repository.PiezaFisicaRepository;
 import java.util.List;
@@ -53,7 +52,9 @@ public class PiezaFisicaService {
         pieza.setDescripcion(request.descripcion());
         pieza.setFechaIngreso(request.fechaIngreso());
         pieza.setTipoMaterial(request.tipoMaterial());
-        pieza.setEstado(request.estado() != null ? request.estado() : EstadoPieza.EN_DEPOSITO);
+        if (request.estado() != null) {
+            pieza.setEstado(request.estado());
+        }
         pieza.validar();
 
         if (piezaFisicaRepository.existsByCodigoInventario(pieza.getCodigoInventario())) {
