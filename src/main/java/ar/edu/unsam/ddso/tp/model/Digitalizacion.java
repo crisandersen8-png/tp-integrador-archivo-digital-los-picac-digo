@@ -1,6 +1,7 @@
 package ar.edu.unsam.ddso.tp.model;
 
 import ar.edu.unsam.ddso.tp.model.exceptions.DigitalizacionInvalidaException;
+import ar.edu.unsam.ddso.tp.model.exceptions.TagInvalidoException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -81,6 +82,9 @@ public class Digitalizacion {
 
     /** Asocia un tag a esta digitalizacion manteniendo ambos lados sincronizados. */
     public void asociarTag(Tag tag) {
+        if (tag == null) {
+            throw new TagInvalidoException("El tag a asociar no puede ser nulo");
+        }
         tags.add(tag);
         tag.getDigitalizaciones().add(this);
     }

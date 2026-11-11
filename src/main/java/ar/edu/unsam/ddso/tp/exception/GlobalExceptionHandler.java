@@ -2,6 +2,8 @@ package ar.edu.unsam.ddso.tp.exception;
 
 import ar.edu.unsam.ddso.tp.model.exceptions.DigitalizacionInvalidaException;
 import ar.edu.unsam.ddso.tp.model.exceptions.PiezaFisicaInvalidaException;
+import ar.edu.unsam.ddso.tp.model.exceptions.RangoFechasInvalidoException;
+import ar.edu.unsam.ddso.tp.model.exceptions.TagInvalidoException;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -11,20 +13,23 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /** Manejador global de excepciones para traducir errores a respuestas HTTP homogeneas. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(PiezaFisicaNoEncontradaException.class)
-    public ResponseEntity<Map<String, String>> manejarPiezaNoEncontrada(
-            PiezaFisicaNoEncontradaException ex) {
+    @ExceptionHandler({
+        PiezaFisicaNoEncontradaException.class,
+        DigitalizacionNoEncontradaException.class,
+        TagNoEncontradoException.class
+    })
+    public ResponseEntity<Map<String, String>> manejarRecursoNoEncontrado(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler(CodigoInventarioDuplicadoException.class)
-    public ResponseEntity<Map<String, String>> manejarCodigoDuplicado(
-            CodigoInventarioDuplicadoException ex) {
+    @ExceptionHandler({CodigoInventarioDuplicadoException.class, TagDuplicadoException.class})
+    public ResponseEntity<Map<String, String>> manejarRecursoDuplicado(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
     }
 
@@ -35,7 +40,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", "Violacion de restriccion de unicidad o integridad de datos"));
     }
 
-    @ExceptionHandler({PiezaFisicaInvalidaException.class, DigitalizacionInvalidaException.class})
+    @ExceptionHandler({
+        PiezaFisicaInvalidaException.class,
+        DigitalizacionInvalidaException.class,
+        TagInvalidoException.class,
+        RangoFechasInvalidoException.class
+    })
     public ResponseEntity<Map<String, String>> manejarErrorDeNegocio(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", ex.getMessage()));
     }
@@ -51,14 +61,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", mensaje));
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> manejarJsonMalFormado(
-            HttpMessageNotReadableException ex) {
+    @ExceptionHandler({
+        HttpMessageNotReadableException.class,
+        MethodArgumentTypeMismatchException.class
+    })
+    public ResponseEntity<Map<String, String>> manejarFormatoDeEntradaInvalido(Exception ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(
                         Map.of(
                                 "error",
-                                "El cuerpo de la solicitud tiene un formato JSON o tipo de dato"
-                                        + " invalido"));
+                                "El formato de los parametros o del cuerpo JSON es invalido"));
     }
 }
