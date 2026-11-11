@@ -44,15 +44,11 @@ La API constituye el núcleo de servicios del backend monolítico en Spring Boot
 
 ## 4. Estructura Estándar de Error
 
-Todas las respuestas de error retornan un payload con la siguiente estructura:
+Todas las respuestas de error retornan un payload con la siguiente estructura (`Map.of("error", mensaje)` según `AGENTS.md`):
 
 ```json
 {
-  "timestamp": "2026-11-07T21:00:00Z",
-  "status": 404,
-  "error": "Not Found",
-  "message": "Pieza física con ID 10 no encontrada",
-  "path": "/api/v1/piezas-fisicas/10"
+  "error": "Pieza fisica con ID 10 no encontrada"
 }
 ```
 
@@ -60,30 +56,23 @@ Todas las respuestas de error retornan un payload con la siguiente estructura:
 
 ## 5. Resumen de Endpoints
 
-### 5.1. Módulo de Piezas Físicas (Catalogación)
+### 5.1. Módulo de Piezas Físicas (Digitalización)
 | Método | Endpoint | Descripción | Request DTO | Response DTO | Código |
 |---|---|---|---|---|---|
 | `POST` | `/api/v1/piezas-fisicas` | Registrar nueva pieza física | `PiezaFisicaCreateRequestDTO` | `PiezaFisicaResponseDTO` | 201 |
-| `GET` | `/api/v1/piezas-fisicas` | Listar piezas físicas (con filtros opcionales) | - | `List<PiezaFisicaResponseDTO>` | 200 |
 | `GET` | `/api/v1/piezas-fisicas/{id}` | Obtener detalle de pieza con sus digitalizaciones | - | `PiezaFisicaDetalleResponseDTO` | 200 |
-| `PUT` | `/api/v1/piezas-fisicas/{id}` | Actualizar datos de una pieza física | `PiezaFisicaUpdateRequestDTO` | `PiezaFisicaResponseDTO` | 200 |
-| `DELETE` | `/api/v1/piezas-fisicas/{id}` | Eliminar una pieza física y sus digitalizaciones | - | - | 204 |
 
 ### 5.2. Módulo de Digitalizaciones
 | Método | Endpoint | Descripción | Request DTO | Response DTO | Código |
 |---|---|---|---|---|---|
 | `POST` | `/api/v1/piezas-fisicas/{piezaId}/digitalizaciones` | Cargar recurso digitalizado a una pieza | `DigitalizacionCreateRequestDTO` | `DigitalizacionResponseDTO` | 201 |
-| `GET` | `/api/v1/digitalizaciones/{id}` | Obtener detalle de una digitalización y sus tags | - | `DigitalizacionResponseDTO` | 200 |
 | `POST` | `/api/v1/digitalizaciones/{id}/tags` | Asociar etiqueta/tag a una digitalización | `AsociarTagRequestDTO` | `DigitalizacionResponseDTO` | 200 |
-| `DELETE` | `/api/v1/digitalizaciones/{id}/tags/{tagId}` | Desvincular tag de una digitalización | - | `DigitalizacionResponseDTO` | 200 |
-| `DELETE` | `/api/v1/digitalizaciones/{id}` | Eliminar una digitalización | - | - | 204 |
 
-### 5.3. Módulo de Tags (Etiquetas Dinámicas)
+### 5.3. Módulo de Tags (Catalogación Dinámica)
 | Método | Endpoint | Descripción | Request DTO | Response DTO | Código |
 |---|---|---|---|---|---|
 | `POST` | `/api/v1/tags` | Crear nuevo tag en tiempo de ejecución | `TagCreateRequestDTO` | `TagResponseDTO` | 201 |
 | `GET` | `/api/v1/tags` | Listar todos los tags del sistema | - | `List<TagResponseDTO>` | 200 |
-| `DELETE` | `/api/v1/tags/{id}` | Eliminar un tag | - | - | 204 |
 
 ### 5.4. Módulo de Disponibilización (Búsquedas para Bot de Telegram y Clientes)
 | Método | Endpoint | Descripción | Parámetros Query | Response DTO | Código |

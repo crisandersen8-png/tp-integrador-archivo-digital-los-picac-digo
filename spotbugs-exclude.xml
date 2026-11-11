@@ -2,12 +2,16 @@
 <FindBugsFilter>
   <!--
     EI_EXPOSE_REP / EI_EXPOSE_REP2: SpotBugs flags getters/setters that return or store direct
-    references to mutable objects. Domain/JPA entities under `model` reference other entities
-    and JPA-managed collections; defensively copying those would break entity identity and ORM
-    semantics, so it's excluded for that package.
+    references to mutable objects, as well as Spring constructor injection of @Service beans.
+    Domain/JPA entities under `model` reference other entities and JPA-managed collections;
+    defensively copying those would break entity identity and ORM semantics.
   -->
   <Match>
-    <Package name="ar.edu.unsam.ddso.tp.model" />
+    <Or>
+      <Package name="ar.edu.unsam.ddso.tp.model" />
+      <Package name="ar.edu.unsam.ddso.tp.controller" />
+      <Package name="ar.edu.unsam.ddso.tp.service" />
+    </Or>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
   </Match>
 </FindBugsFilter>

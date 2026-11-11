@@ -2,9 +2,40 @@ package ar.edu.unsam.ddso.tp.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import ar.edu.unsam.ddso.tp.model.exceptions.PiezaFisicaInvalidaException;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class PiezaFisicaTest {
+
+    @Test
+    void validarPiezaConDatosObligatoriosMantieneEstadoPorDefectoEnDeposito() {
+        // Dado
+        PiezaFisica pieza = new PiezaFisica();
+        pieza.setCodigoInventario("INV-2026-0001");
+        pieza.setNombre("Acta Fundacional");
+        pieza.setFechaIngreso(LocalDate.of(2026, 3, 15));
+        pieza.setTipoMaterial("Documento Papel");
+
+        // Cuando
+        pieza.validar();
+
+        // Entonces
+        assertEquals(ar.edu.unsam.ddso.tp.model.enums.EstadoPieza.EN_DEPOSITO, pieza.getEstado());
+    }
+
+    @Test
+    void validarPiezaSinNombreLanzaPiezaFisicaInvalidaException() {
+        // Dado
+        PiezaFisica pieza = new PiezaFisica();
+        pieza.setCodigoInventario("INV-2026-0001");
+        pieza.setNombre("   ");
+        pieza.setFechaIngreso(LocalDate.of(2026, 3, 15));
+        pieza.setTipoMaterial("Documento Papel");
+
+        // Cuando / Entonces
+        assertThrows(PiezaFisicaInvalidaException.class, pieza::validar);
+    }
 
     @Test
     void agregarDigitalizacionCreaYVinculaAmbosLados() {

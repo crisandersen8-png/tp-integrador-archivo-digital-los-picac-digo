@@ -1,6 +1,7 @@
 package ar.edu.unsam.ddso.tp.model;
 
 import ar.edu.unsam.ddso.tp.model.enums.EstadoPieza;
+import ar.edu.unsam.ddso.tp.model.exceptions.PiezaFisicaInvalidaException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,19 +51,43 @@ public class PiezaFisica {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private EstadoPieza estado;
+    private EstadoPieza estado = EstadoPieza.EN_DEPOSITO;
 
     @OneToMany(mappedBy = "piezaFisica", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Digitalizacion> digitalizaciones = new ArrayList<>();
 
+    /** Valida las invariantes de negocio obligatorias de la pieza fisica sin mutar su estado. */
+    public void validar() {
+        if (codigoInventario == null || codigoInventario.isBlank()) {
+            throw new PiezaFisicaInvalidaException("El codigo de inventario es obligatorio");
+        }
+        if (nombre == null || nombre.isBlank()) {
+            throw new PiezaFisicaInvalidaException("El nombre de la pieza fisica es obligatorio");
+        }
+        if (fechaIngreso == null) {
+            throw new PiezaFisicaInvalidaException(
+                    "La fecha de ingreso de la pieza fisica es obligatoria");
+        }
+        if (tipoMaterial == null || tipoMaterial.isBlank()) {
+            throw new PiezaFisicaInvalidaException(
+                    "El tipo de material de la pieza fisica es obligatorio");
+        }
+        if (estado == null) {
+            throw new PiezaFisicaInvalidaException(
+                    "El estado de la pieza fisica es obligatorio");
+        }
+    }
+
     /** Crea una digitalizacion de esta pieza y la vincula manteniendo ambos lados sincronizados. */
-    public void agregarDigitalizacion(String url, String descripcionDigitalizacion) {
+    public Digitalizacion agregarDigitalizacion(String url, String descripcionDigitalizacion) {
         Digitalizacion digitalizacion = new Digitalizacion();
         digitalizacion.setUrlRecurso(url);
         digitalizacion.setDescripcion(descripcionDigitalizacion);
         digitalizacion.setFechaDigitalizacion(LocalDateTime.now());
+        digitalizacion.validar();
         digitalizacion.setPiezaFisica(this);
         digitalizaciones.add(digitalizacion);
+        return digitalizacion;
     }
 
     /** Quita una digitalizacion de esta pieza manteniendo ambos lados sincronizados. */

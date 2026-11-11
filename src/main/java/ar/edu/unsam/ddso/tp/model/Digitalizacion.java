@@ -1,5 +1,6 @@
 package ar.edu.unsam.ddso.tp.model;
 
+import ar.edu.unsam.ddso.tp.model.exceptions.DigitalizacionInvalidaException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +12,8 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -51,6 +54,30 @@ public class Digitalizacion {
             joinColumns = @JoinColumn(name = "digitalizacion_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
+
+    /** Valida que el recurso digitalizado tenga una URL HTTP o HTTPS con formato valido. */
+    public void validar() {
+        if (urlRecurso == null || urlRecurso.isBlank()) {
+            throw new DigitalizacionInvalidaException(
+                    "La URL del recurso digitalizado es obligatoria");
+        }
+        try {
+            URI uri = new URI(urlRecurso.trim());
+            String esquema = uri.getScheme();
+            String host = uri.getHost();
+            if (esquema == null
+                    || (!"http".equalsIgnoreCase(esquema) && !"https".equalsIgnoreCase(esquema))
+                    || host == null
+                    || host.isBlank()) {
+                throw new DigitalizacionInvalidaException(
+                        "La URL del recurso digitalizado debe ser una direccion HTTP o HTTPS"
+                                + " valida");
+            }
+        } catch (URISyntaxException ex) {
+            throw new DigitalizacionInvalidaException(
+                    "La URL del recurso digitalizado tiene un formato invalido", ex);
+        }
+    }
 
     /** Asocia un tag a esta digitalizacion manteniendo ambos lados sincronizados. */
     public void asociarTag(Tag tag) {
