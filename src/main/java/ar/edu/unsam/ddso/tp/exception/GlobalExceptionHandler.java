@@ -2,7 +2,6 @@ package ar.edu.unsam.ddso.tp.exception;
 
 import ar.edu.unsam.ddso.tp.model.exceptions.DigitalizacionInvalidaException;
 import ar.edu.unsam.ddso.tp.model.exceptions.PiezaFisicaInvalidaException;
-import ar.edu.unsam.ddso.tp.model.exceptions.RangoFechasInvalidoException;
 import ar.edu.unsam.ddso.tp.model.exceptions.TagInvalidoException;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;

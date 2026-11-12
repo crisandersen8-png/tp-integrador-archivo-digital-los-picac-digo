@@ -1,10 +1,9 @@
-package ar.edu.unsam.ddso.tp.model.exceptions;
+package ar.edu.unsam.ddso.tp.exception;
 
-/** Excepcion lanzada cuando la fecha inicial de busqueda es posterior a la fecha final. */
+/** Excepcion lanzada cuando el parametro fechaDesde es posterior a fechaHasta en una consulta. */
 public class RangoFechasInvalidoException extends RuntimeException {
 
     public RangoFechasInvalidoException(String mensaje) {
         super(mensaje);
     }
 }
-

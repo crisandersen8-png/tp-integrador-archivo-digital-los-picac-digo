@@ -1,9 +1,9 @@
 package ar.edu.unsam.ddso.tp.controller;
 
+import ar.edu.unsam.ddso.tp.dto.PaginaResponseDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
 import ar.edu.unsam.ddso.tp.service.DisponibilizacionService;
 import java.time.LocalDate;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,17 +25,19 @@ public class DisponibilizacionController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<Page<PiezaFisicaResponseDTO>> buscarPiezas(
+    public ResponseEntity<PaginaResponseDTO<PiezaFisicaResponseDTO>> buscarPiezas(
             @RequestParam(required = false) String termino,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate fechaDesde,
+                  LocalDate fechaDesde,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate fechaHasta,
+                  LocalDate fechaHasta,
             @RequestParam(required = false) String tag,
-            @PageableDefault(size = 20) Pageable pageable) {
+            @PageableDefault(
+                            size = 20,
+                            sort = {"fechaIngreso", "id"})
+                    Pageable pageable) {
         return ResponseEntity.ok(
                 disponibilizacionService.buscarPiezas(
                         termino, fechaDesde, fechaHasta, tag, pageable));
     }
 }
-

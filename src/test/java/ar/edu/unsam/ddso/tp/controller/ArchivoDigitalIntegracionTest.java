@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -86,7 +87,7 @@ class ArchivoDigitalIntegracionTest {
                 .andExpect(jsonPath("$.cantidadDigitalizaciones", is(0)));
 
         assertEquals(1, piezaFisicaRepository.count());
-        assertTrue(piezaFisicaRepository.existsByCodigoInventario("INV-2026-0001"));
+        assertTrue(piezaFisicaRepository.existsByCodigoInventarioIgnoreCase("INV-2026-0001"));
     }
 
     @Test
@@ -448,6 +449,33 @@ class ArchivoDigitalIntegracionTest {
                                 .content("{\"tagId\": 9999}"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error", is("Tag con ID 9999 no encontrado")));
+    }
+
+    @Test
+    void eliminarTagExistenteAsociadoADigitalizacionDevuelve204YDesvinculaDePieza()
+            throws Exception {
+        // Dado
+        PiezaFisica pieza =
+                guardarPieza("INV-2026-0205", "Plano Arquitectonico", "Tinta", "2026-03-16");
+        Digitalizacion dig =
+                pieza.agregarDigitalizacion("https://archivo.org/plano.jpg", "Plano general");
+        Tag tag = new Tag();
+        tag.setNombre("ARQUITECTURA");
+        tag = tagRepository.save(tag);
+        dig.asociarTag(tag);
+        digitalizacionRepository.save(dig);
+
+        // Cuando / Entonces: elimina tag asociado devolviendo 204
+        mockMvc.perform(delete("/api/v1/tags/{id}", tag.getId()))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/piezas-fisicas/{id}", pieza.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.digitalizaciones[0].tags", hasSize(0)));
+
+        // Eliminar un tag ya inexistente devuelve 404
+        mockMvc.perform(delete("/api/v1/tags/{id}", tag.getId()))
+                .andExpect(status().isNotFound());
     }
 
     // ---------- 4. Busquedas, filtros y paginacion ----------

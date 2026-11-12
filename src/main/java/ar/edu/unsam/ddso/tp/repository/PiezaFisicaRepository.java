@@ -14,8 +14,6 @@ public interface PiezaFisicaRepository
 
     Optional<PiezaFisica> findByCodigoInventario(String codigoInventario);
 
-    boolean existsByCodigoInventario(String codigoInventario);
-
     boolean existsByCodigoInventarioIgnoreCase(String codigoInventario);
 
     /**

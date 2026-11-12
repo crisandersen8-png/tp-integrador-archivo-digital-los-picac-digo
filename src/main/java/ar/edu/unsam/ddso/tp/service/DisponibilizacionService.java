@@ -1,8 +1,9 @@
 package ar.edu.unsam.ddso.tp.service;
 
+import ar.edu.unsam.ddso.tp.dto.PaginaResponseDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
+import ar.edu.unsam.ddso.tp.exception.RangoFechasInvalidoException;
 import ar.edu.unsam.ddso.tp.model.PiezaFisica;
-import ar.edu.unsam.ddso.tp.model.exceptions.RangoFechasInvalidoException;
 import ar.edu.unsam.ddso.tp.repository.PiezaFisicaRepository;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ public class DisponibilizacionService {
     // ---------- Consultas ----------
 
     @Transactional(readOnly = true)
-    public Page<PiezaFisicaResponseDTO> buscarPiezas(
+    public PaginaResponseDTO<PiezaFisicaResponseDTO> buscarPiezas(
             String termino,
             LocalDate fechaDesde,
             LocalDate fechaHasta,
@@ -33,25 +34,9 @@ public class DisponibilizacionService {
             throw new RangoFechasInvalidoException(
                     "La fecha desde no puede ser posterior a la fecha hasta");
         }
-        return piezaFisicaRepository
-                .buscarAvanzado(termino, fechaDesde, fechaHasta, tag, pageable)
-                .map(this::aPiezaFisicaResponseDTO);
-    }
-
-    // ---------- Privados ----------
-
-    private PiezaFisicaResponseDTO aPiezaFisicaResponseDTO(PiezaFisica pieza) {
-        int cantidad =
-                pieza.getDigitalizaciones() == null ? 0 : pieza.getDigitalizaciones().size();
-        return new PiezaFisicaResponseDTO(
-                pieza.getId(),
-                pieza.getCodigoInventario(),
-                pieza.getNombre(),
-                pieza.getDescripcion(),
-                pieza.getFechaIngreso(),
-                pieza.getTipoMaterial(),
-                pieza.getEstado(),
-                cantidad);
+        Page<PiezaFisica> pagina =
+                piezaFisicaRepository.buscarAvanzado(
+                        termino, fechaDesde, fechaHasta, tag, pageable);
+        return ArchivoDigitalMapper.aPaginaPiezaFisicaResponseDTO(pagina);
     }
 }
-

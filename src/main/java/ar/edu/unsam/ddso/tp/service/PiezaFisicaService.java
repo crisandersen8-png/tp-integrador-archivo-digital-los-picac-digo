@@ -5,15 +5,12 @@ import ar.edu.unsam.ddso.tp.dto.DigitalizacionResponseDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaCreateRequestDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaDetalleResponseDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
-import ar.edu.unsam.ddso.tp.dto.TagResponseDTO;
 import ar.edu.unsam.ddso.tp.exception.CodigoInventarioDuplicadoException;
 import ar.edu.unsam.ddso.tp.exception.PiezaFisicaNoEncontradaException;
 import ar.edu.unsam.ddso.tp.model.Digitalizacion;
 import ar.edu.unsam.ddso.tp.model.PiezaFisica;
-import ar.edu.unsam.ddso.tp.model.Tag;
 import ar.edu.unsam.ddso.tp.repository.DigitalizacionRepository;
 import ar.edu.unsam.ddso.tp.repository.PiezaFisicaRepository;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +36,7 @@ public class PiezaFisicaService {
                 piezaFisicaRepository
                         .findById(id)
                         .orElseThrow(() -> new PiezaFisicaNoEncontradaException(id));
-        return aPiezaFisicaDetalleResponseDTO(pieza);
+        return ArchivoDigitalMapper.aPiezaFisicaDetalleResponseDTO(pieza);
     }
 
     // ---------- Operaciones ----------
@@ -64,7 +61,7 @@ public class PiezaFisicaService {
         }
 
         PiezaFisica guardada = piezaFisicaRepository.save(pieza);
-        return aPiezaFisicaResponseDTO(guardada);
+        return ArchivoDigitalMapper.aPiezaFisicaResponseDTO(guardada);
     }
 
     @Transactional
@@ -77,62 +74,6 @@ public class PiezaFisicaService {
         Digitalizacion digitalizacion =
                 pieza.agregarDigitalizacion(request.urlRecurso(), request.descripcion());
         Digitalizacion guardada = digitalizacionRepository.save(digitalizacion);
-        return aDigitalizacionResponseDTO(guardada);
-    }
-
-    // ---------- Privados ----------
-
-    private PiezaFisicaResponseDTO aPiezaFisicaResponseDTO(PiezaFisica pieza) {
-        int cantidad =
-                pieza.getDigitalizaciones() == null ? 0 : pieza.getDigitalizaciones().size();
-        return new PiezaFisicaResponseDTO(
-                pieza.getId(),
-                pieza.getCodigoInventario(),
-                pieza.getNombre(),
-                pieza.getDescripcion(),
-                pieza.getFechaIngreso(),
-                pieza.getTipoMaterial(),
-                pieza.getEstado(),
-                cantidad);
-    }
-
-    private PiezaFisicaDetalleResponseDTO aPiezaFisicaDetalleResponseDTO(PiezaFisica pieza) {
-        List<DigitalizacionResponseDTO> digitalizaciones =
-                pieza.getDigitalizaciones() == null
-                        ? List.of()
-                        : pieza.getDigitalizaciones().stream()
-                                .map(this::aDigitalizacionResponseDTO)
-                                .toList();
-        return new PiezaFisicaDetalleResponseDTO(
-                pieza.getId(),
-                pieza.getCodigoInventario(),
-                pieza.getNombre(),
-                pieza.getDescripcion(),
-                pieza.getFechaIngreso(),
-                pieza.getTipoMaterial(),
-                pieza.getEstado(),
-                digitalizaciones);
-    }
-
-    private DigitalizacionResponseDTO aDigitalizacionResponseDTO(Digitalizacion digitalizacion) {
-        Long piezaFisicaId =
-                digitalizacion.getPiezaFisica() != null
-                        ? digitalizacion.getPiezaFisica().getId()
-                        : null;
-        List<TagResponseDTO> tags =
-                digitalizacion.getTags() == null
-                        ? List.of()
-                        : digitalizacion.getTags().stream().map(this::aTagResponseDTO).toList();
-        return new DigitalizacionResponseDTO(
-                digitalizacion.getId(),
-                piezaFisicaId,
-                digitalizacion.getUrlRecurso(),
-                digitalizacion.getDescripcion(),
-                digitalizacion.getFechaDigitalizacion(),
-                tags);
-    }
-
-    private TagResponseDTO aTagResponseDTO(Tag tag) {
-        return new TagResponseDTO(tag.getId(), tag.getNombre());
+        return ArchivoDigitalMapper.aDigitalizacionResponseDTO(guardada);
     }
 }

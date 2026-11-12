@@ -73,11 +73,12 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
 |---|---|---|---|---|---|
 | `POST` | `/api/v1/tags` | Crear nuevo tag en tiempo de ejecución | `TagCreateRequestDTO` | `TagResponseDTO` | 201 |
 | `GET` | `/api/v1/tags` | Listar todos los tags del sistema | - | `List<TagResponseDTO>` | 200 |
+| `DELETE` | `/api/v1/tags/{id}` | Eliminar un tag del sistema | - | - | 204 |
 
 ### 5.4. Módulo de Disponibilización (Búsquedas para Bot de Telegram y Clientes)
 | Método | Endpoint | Descripción | Parámetros Query | Response DTO | Código |
 |---|---|---|---|---|---|
-| `GET` | `/api/v1/piezas-fisicas/buscar` | Buscar piezas físicas paginadas (por término, fechas y tag de sus digitalizaciones) | `?termino=acta&fechaDesde=2026-01-01&fechaHasta=2026-12-31&tag=FOTOGRAFIA&page=0&size=10` | `Page<PiezaFisicaResponseDTO>` | 200 |
+| `GET` | `/api/v1/piezas-fisicas/buscar` | Buscar piezas físicas paginadas (por término, fechas y tag de sus digitalizaciones) | `?termino=acta&fechaDesde=2026-01-01&fechaHasta=2026-12-31&tag=FOTOGRAFIA&page=0&size=10` | `PaginaResponseDTO<PiezaFisicaResponseDTO>` | 200 |
 
 ---
 
@@ -233,7 +234,7 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
 - **Endpoint:** `GET /api/v1/piezas-fisicas/buscar?termino=acta&tag=FOTOGRAFIA&page=0&size=10`
 - **Descripción:** Permite buscar piezas físicas combinando filtros opcionales por término libre (nombre, descripción o código de inventario), rango de fecha de ingreso (`fechaDesde`, `fechaHasta`) y nombre de etiqueta (`tag`) asociada a sus digitalizaciones, retornando una respuesta paginada apta para gran volumen de datos.
 
-#### Response Body (`200 OK` - `Page<PiezaFisicaResponseDTO>`):
+#### Response Body (`200 OK` - `PaginaResponseDTO<PiezaFisicaResponseDTO>`):
 ```json
 {
   "content": [
@@ -244,13 +245,12 @@ Todas las respuestas de error retornan un payload con la siguiente estructura (`
       "descripcion": "Manuscrito en papel de lino con firmas de miembros fundadores",
       "fechaIngreso": "2026-03-15",
       "tipoMaterial": "Documento Papel",
+      "estado": "EN_DEPOSITO",
       "cantidadDigitalizaciones": 2
     }
   ],
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 10
-  },
+  "pageNumber": 0,
+  "pageSize": 10,
   "totalElements": 1,
   "totalPages": 1,
   "last": true

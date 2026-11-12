@@ -169,5 +169,36 @@ class CatalogacionServiceTest {
                                 11L, new AsociarTagRequestDTO(99L)));
         verify(digitalizacionRepository, never()).save(any(Digitalizacion.class));
     }
+
+    @Test
+    void eliminarTagExistenteDesasociaDeDigitalizacionesYElimina() {
+        // Dado
+        Tag tag = new Tag();
+        tag.setId(7L);
+        tag.setNombre("RESTAURADO");
+
+        Digitalizacion digitalizacion = new Digitalizacion();
+        digitalizacion.setId(11L);
+        digitalizacion.asociarTag(tag);
+
+        when(tagRepository.findById(7L)).thenReturn(Optional.of(tag));
+
+        // Cuando
+        catalogacionService.eliminarTag(7L);
+
+        // Entonces
+        assertTrue(digitalizacion.getTags().isEmpty());
+        verify(tagRepository).delete(tag);
+    }
+
+    @Test
+    void eliminarTagInexistenteLanzaTagNoEncontradoException() {
+        // Dado
+        when(tagRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Cuando / Entonces
+        assertThrows(TagNoEncontradoException.class, () -> catalogacionService.eliminarTag(99L));
+        verify(tagRepository, never()).delete(any(Tag.class));
+    }
 }
 

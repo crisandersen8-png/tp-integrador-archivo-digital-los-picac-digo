@@ -5,10 +5,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import ar.edu.unsam.ddso.tp.dto.PaginaResponseDTO;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
+import ar.edu.unsam.ddso.tp.exception.RangoFechasInvalidoException;
 import ar.edu.unsam.ddso.tp.model.PiezaFisica;
 import ar.edu.unsam.ddso.tp.model.enums.EstadoPieza;
-import ar.edu.unsam.ddso.tp.model.exceptions.RangoFechasInvalidoException;
 import ar.edu.unsam.ddso.tp.repository.PiezaFisicaRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +35,7 @@ class DisponibilizacionServiceTest {
     }
 
     @Test
-    void buscarPiezasConFiltrosValidosDevuelvePaginaDeDTOs() {
+    void buscarPiezasConFiltrosValidosDevuelvePaginaResponseDTO() {
         // Dado
         PiezaFisica pieza = new PiezaFisica();
         pieza.setId(1L);
@@ -54,14 +54,18 @@ class DisponibilizacionServiceTest {
                 .thenReturn(new PageImpl<>(List.of(pieza), pageable, 1));
 
         // Cuando
-        Page<PiezaFisicaResponseDTO> resultado =
+        PaginaResponseDTO<PiezaFisicaResponseDTO> resultado =
                 disponibilizacionService.buscarPiezas(
                         "acta", desde, hasta, "FOTOGRAFIA", pageable);
 
         // Entonces
-        assertEquals(1, resultado.getTotalElements());
-        assertEquals("INV-2026-0042", resultado.getContent().get(0).codigoInventario());
-        assertEquals("Acta Fundacional", resultado.getContent().get(0).nombre());
+        assertEquals(1, resultado.totalElements());
+        assertEquals(1, resultado.totalPages());
+        assertEquals(0, resultado.pageNumber());
+        assertEquals(10, resultado.pageSize());
+        assertTrue(resultado.last());
+        assertEquals("INV-2026-0042", resultado.content().get(0).codigoInventario());
+        assertEquals("Acta Fundacional", resultado.content().get(0).nombre());
     }
 
     @Test
@@ -78,4 +82,3 @@ class DisponibilizacionServiceTest {
         verify(piezaFisicaRepository, never()).buscarAvanzado(null, desde, hasta, null, pageable);
     }
 }
-
