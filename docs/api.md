@@ -26,6 +26,11 @@ La API constituye el núcleo de servicios del backend monolítico en Spring Boot
 - **Administrador / Archivista:** Altas, modificaciones y bajas de piezas físicas, carga de recursos digitales y administración de tags.
 - **Bot de Telegram:** Servicio consumidor que realiza búsquedas de recursos digitales y consulta información de las piezas físicas para usuarios finales.
 
+### Documentación Interactiva (Swagger UI)
+Con la aplicación ejecutándose en local, se puede acceder a la documentación interactiva y probar todos los endpoints desde:
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html`
+- **OpenAPI JSON:** `http://localhost:8080/v3/api-docs`
+
 ---
 
 ## 3. Códigos de Estado HTTP
