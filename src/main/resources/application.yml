@@ -20,3 +20,8 @@ spring:
   sql:
     init:
       mode: always
+telegram:
+  bot:
+    enabled: ${TELEGRAM_BOT_ENABLED:false}
+    token: ${TELEGRAM_BOT_TOKEN:}
+    username: ${TELEGRAM_BOT_USERNAME:archivo_digital_bot}

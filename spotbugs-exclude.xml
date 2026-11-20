@@ -11,6 +11,10 @@
       <Package name="ar.edu.unsam.ddso.tp.model" />
       <Package name="ar.edu.unsam.ddso.tp.controller" />
       <Package name="ar.edu.unsam.ddso.tp.service" />
+      <Package name="ar.edu.unsam.ddso.tp.bot" />
+      <Package name="ar.edu.unsam.ddso.tp.bot.config" />
+      <Package name="ar.edu.unsam.ddso.tp.bot.dispatcher" />
+      <Package name="ar.edu.unsam.ddso.tp.bot.formatter" />
     </Or>
     <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
   </Match>
