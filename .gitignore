@@ -239,3 +239,8 @@ buildNumber.properties
 # End of https://www.toptal.com/developers/gitignore/api/maven,java,eclipse,intellij+iml,visualstudiocode,web
 
 .idea
+
+### Entorno y Credenciales Locales ###
+.env
+.env.local
+.env.*.local
