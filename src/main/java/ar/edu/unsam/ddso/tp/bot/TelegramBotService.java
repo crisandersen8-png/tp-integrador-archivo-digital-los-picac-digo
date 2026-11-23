@@ -4,6 +4,7 @@ import ar.edu.unsam.ddso.tp.bot.config.TelegramBotConfig;
 import ar.edu.unsam.ddso.tp.bot.dispatcher.TelegramCommandDispatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -28,6 +29,7 @@ public class TelegramBotService implements SpringLongPollingBot, LongPollingSing
     private final TelegramCommandDispatcher dispatcher;
     private final TelegramClient telegramClient;
 
+    @Autowired
     public TelegramBotService(TelegramBotConfig botConfig, TelegramCommandDispatcher dispatcher) {
         this(botConfig, dispatcher, new OkHttpTelegramClient(botConfig.getToken()));
     }
