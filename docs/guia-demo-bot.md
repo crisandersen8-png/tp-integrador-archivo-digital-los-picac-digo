@@ -8,7 +8,26 @@ Esta guía contiene los pasos exactos para levantar el sistema desde cero y most
 
 Abrí una terminal en la carpeta del proyecto (`tp-integrador-archivo-digital-los-picac-digo`).
 
-### En Git Bash:
+### Método Rápido (Recomendado):
+El proyecto ya cuenta con el archivo `.env` configurado localmente. Solo ejecutá:
+
+* **En Git Bash:**
+  ```bash
+  ./run-bot.sh
+  ```
+* **En PowerShell:**
+  ```powershell
+  .\run-bot.ps1
+  ```
+
+*(El script lee automáticamente el `.env` y levanta Spring Boot sin que tengas que tipear ninguna credencial).*
+
+---
+
+### Método Manual Alternativo:
+Si preferís exportar manualmente las variables en tu terminal:
+
+#### En Git Bash:
 ```bash
 export TELEGRAM_BOT_ENABLED="true"
 export TELEGRAM_BOT_TOKEN="9249490649:AAE_YdJztUIiEbcB3jKsFeeK3S0kAMPSNNc"
@@ -17,7 +36,7 @@ export TELEGRAM_BOT_USERNAME="archivo_digital_demo_bot"
 ./mvnw spring-boot:run
 ```
 
-### O en PowerShell:
+#### En PowerShell:
 ```powershell
 $env:TELEGRAM_BOT_ENABLED="true"
 $env:TELEGRAM_BOT_TOKEN="9249490649:AAE_YdJztUIiEbcB3jKsFeeK3S0kAMPSNNc"
