@@ -1,6 +1,9 @@
 package ar.edu.unsam.ddso.tp.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -168,6 +171,97 @@ class CatalogacionServiceTest {
                         catalogacionService.asociarTagADigitalizacion(
                                 11L, new AsociarTagRequestDTO(99L)));
         verify(digitalizacionRepository, never()).save(any(Digitalizacion.class));
+    }
+
+    @Test
+    void actualizarTag_conNombreValido_actualizaYDevuelveDTO() {
+        // Dado
+        Tag tag = new Tag();
+        tag.setId(7L);
+        tag.setNombre("RESTAURADO");
+        when(tagRepository.findById(7L)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNombreIgnoreCase("RESTAURADO PARCIAL")).thenReturn(false);
+        when(tagRepository.save(tag)).thenReturn(tag);
+
+        // Cuando
+        TagResponseDTO respuesta =
+                catalogacionService.actualizarTag(7L, new TagCreateRequestDTO("  RESTAURADO PARCIAL  "));
+
+        // Entonces
+        assertEquals(7L, respuesta.id());
+        assertEquals("RESTAURADO PARCIAL", respuesta.nombre());
+        assertEquals("RESTAURADO PARCIAL", tag.getNombre());
+        verify(tagRepository).save(tag);
+    }
+
+    @Test
+    void actualizarTag_tagInexistente_lanzaTagNoEncontradoException() {
+        // Dado
+        when(tagRepository.findById(99L)).thenReturn(Optional.empty());
+        TagCreateRequestDTO request = new TagCreateRequestDTO("FOTOGRAFIA");
+
+        // Cuando / Entonces
+        assertThrows(
+                TagNoEncontradoException.class, () -> catalogacionService.actualizarTag(99L, request));
+        verify(tagRepository, never()).save(any(Tag.class));
+    }
+
+    @Test
+    void actualizarTag_nombreDuplicado_lanzaTagDuplicadoException() {
+        // Dado
+        Tag tag = new Tag();
+        tag.setId(7L);
+        tag.setNombre("RESTAURADO");
+        when(tagRepository.findById(7L)).thenReturn(Optional.of(tag));
+        when(tagRepository.existsByNombreIgnoreCase("fotografia")).thenReturn(true);
+        TagCreateRequestDTO request = new TagCreateRequestDTO("fotografia");
+
+        // Cuando / Entonces
+        assertThrows(
+                TagDuplicadoException.class, () -> catalogacionService.actualizarTag(7L, request));
+        assertEquals("RESTAURADO", tag.getNombre());
+        verify(tagRepository, never()).save(any(Tag.class));
+    }
+
+    @Test
+    void eliminarTag_tagExistenteConDigitalizacionesAsociadas_desvinculaYEliminaSinRomperElSistema() {
+        // Dado
+        Tag tag = new Tag();
+        tag.setId(7L);
+        tag.setNombre("RESTAURADO");
+        Tag otroTag = new Tag();
+        otroTag.setId(8L);
+        otroTag.setNombre("FOTOGRAFIA");
+
+        Digitalizacion frente = new Digitalizacion();
+        frente.setId(11L);
+        frente.asociarTag(tag);
+        frente.asociarTag(otroTag);
+        Digitalizacion dorso = new Digitalizacion();
+        dorso.setId(12L);
+        dorso.asociarTag(tag);
+
+        when(tagRepository.findById(7L)).thenReturn(Optional.of(tag));
+
+        // Cuando
+        catalogacionService.eliminarTag(7L);
+
+        // Entonces
+        assertTrue(tag.getDigitalizaciones().isEmpty());
+        assertFalse(frente.getTags().contains(tag));
+        assertFalse(dorso.getTags().contains(tag));
+        assertTrue(frente.getTags().contains(otroTag));
+        verify(tagRepository).delete(tag);
+    }
+
+    @Test
+    void eliminarTag_tagInexistente_lanzaTagNoEncontradoException() {
+        // Dado
+        when(tagRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Cuando / Entonces
+        assertThrows(TagNoEncontradoException.class, () -> catalogacionService.eliminarTag(99L));
+        verify(tagRepository, never()).delete(any(Tag.class));
     }
 }
 
