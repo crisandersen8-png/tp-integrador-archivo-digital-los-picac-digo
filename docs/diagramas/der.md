@@ -15,6 +15,7 @@ erDiagram
         text descripcion
         date fecha_ingreso
         varchar tipo_material
+        varchar estado
     }
 
     DIGITALIZACIONES {
@@ -53,6 +54,7 @@ erDiagram
 | `descripcion` | `TEXT` | SÍ | Reseña o detalle histórico. |
 | `fecha_ingreso` | `DATE` | NO | Fecha de ingreso a la fundación. |
 | `tipo_material` | `VARCHAR(50)` | NO | Clasificación del material (ej. Fotografía, Documento). |
+| `estado` | `VARCHAR(30)` | NO | Estado de conservación (EN_DEPOSITO, EN_EXHIBICION, EN_PRESTAMO, EN_RESTAURACION). |
 
 ### Tabla: `DIGITALIZACIONES`
 | Columna | Tipo | Nulo | Descripción |
