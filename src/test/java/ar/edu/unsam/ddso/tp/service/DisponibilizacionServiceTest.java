@@ -1,16 +1,20 @@
 package ar.edu.unsam.ddso.tp.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
+import ar.edu.unsam.ddso.tp.model.Digitalizacion;
 import ar.edu.unsam.ddso.tp.model.PiezaFisica;
 import ar.edu.unsam.ddso.tp.model.enums.EstadoPieza;
 import ar.edu.unsam.ddso.tp.model.exceptions.RangoFechasInvalidoException;
 import ar.edu.unsam.ddso.tp.repository.PiezaFisicaRepository;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,5 +81,95 @@ class DisponibilizacionServiceTest {
                 () -> disponibilizacionService.buscarPiezas(null, desde, hasta, null, pageable));
         verify(piezaFisicaRepository, never()).buscarAvanzado(null, desde, hasta, null, pageable);
     }
-}
 
+    @Test
+    void buscarPiezasSinFiltrosDevuelvePaginaDeDTOs() {
+        // Dado
+        PiezaFisica pieza = crearPieza(1L, "INV-2026-0001");
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(piezaFisicaRepository.buscarAvanzado(null, null, null, null, pageable))
+                .thenReturn(new PageImpl<>(List.of(pieza), pageable, 1));
+
+        // Cuando
+        Page<PiezaFisicaResponseDTO> resultado =
+                disponibilizacionService.buscarPiezas(null, null, null, null, pageable);
+
+        // Entonces
+        assertEquals(1, resultado.getTotalElements());
+        assertEquals("INV-2026-0001", resultado.getContent().get(0).codigoInventario());
+        verify(piezaFisicaRepository).buscarAvanzado(null, null, null, null, pageable);
+    }
+
+    @Test
+    void buscarPiezasConFechasIgualesNoLanzaExcepcion() {
+        // Dado
+        Pageable pageable = PageRequest.of(0, 10);
+        LocalDate fecha = LocalDate.of(2026, 5, 20);
+
+        when(piezaFisicaRepository.buscarAvanzado(null, fecha, fecha, null, pageable))
+                .thenReturn(new PageImpl<>(List.of(), pageable, 0));
+
+        // Cuando / Entonces
+        assertDoesNotThrow(
+                () -> disponibilizacionService.buscarPiezas(null, fecha, fecha, null, pageable));
+        verify(piezaFisicaRepository).buscarAvanzado(null, fecha, fecha, null, pageable);
+    }
+
+    @Test
+    void buscarPiezasConSoloFechaDesdeNoLanzaExcepcion() {
+        // Dado
+        Pageable pageable = PageRequest.of(0, 10);
+        LocalDate desde = LocalDate.of(2026, 1, 1);
+
+        when(piezaFisicaRepository.buscarAvanzado(null, desde, null, null, pageable))
+                .thenReturn(new PageImpl<>(List.of(), pageable, 0));
+
+        // Cuando / Entonces
+        assertDoesNotThrow(
+                () -> disponibilizacionService.buscarPiezas(null, desde, null, null, pageable));
+        verify(piezaFisicaRepository).buscarAvanzado(null, desde, null, null, pageable);
+    }
+
+    @Test
+    void buscarPiezasMapeaCantidadDigitalizacionesCorrectamente() {
+        // Dado
+        PiezaFisica piezaConDigitalizaciones = crearPieza(1L, "INV-2026-0001");
+        piezaConDigitalizaciones.setDigitalizaciones(
+                new ArrayList<>(List.of(new Digitalizacion(), new Digitalizacion())));
+
+        PiezaFisica piezaSinDigitalizaciones = crearPieza(2L, "INV-2026-0002");
+        piezaSinDigitalizaciones.setDigitalizaciones(null);
+
+        Pageable pageable = PageRequest.of(0, 10);
+
+        when(piezaFisicaRepository.buscarAvanzado(null, null, null, null, pageable))
+                .thenReturn(
+                        new PageImpl<>(
+                                List.of(piezaConDigitalizaciones, piezaSinDigitalizaciones),
+                                pageable,
+                                2));
+
+        // Cuando
+        Page<PiezaFisicaResponseDTO> resultado =
+                disponibilizacionService.buscarPiezas(null, null, null, null, pageable);
+
+        // Entonces
+        assertEquals(2, resultado.getContent().get(0).cantidadDigitalizaciones());
+        assertEquals(0, resultado.getContent().get(1).cantidadDigitalizaciones());
+    }
+
+    // ---------- Privados ----------
+
+    private PiezaFisica crearPieza(Long id, String codigoInventario) {
+        PiezaFisica pieza = new PiezaFisica();
+        pieza.setId(id);
+        pieza.setCodigoInventario(codigoInventario);
+        pieza.setNombre("Pieza de prueba");
+        pieza.setDescripcion("Descripcion de prueba");
+        pieza.setFechaIngreso(LocalDate.of(2026, 3, 15));
+        pieza.setTipoMaterial("Documento Papel");
+        pieza.setEstado(EstadoPieza.EN_DEPOSITO);
+        return pieza;
+    }
+}
