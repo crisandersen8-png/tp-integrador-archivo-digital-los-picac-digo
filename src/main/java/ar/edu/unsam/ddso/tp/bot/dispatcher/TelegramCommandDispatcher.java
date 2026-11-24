@@ -2,8 +2,8 @@ package ar.edu.unsam.ddso.tp.bot.dispatcher;
 
 import ar.edu.unsam.ddso.tp.bot.config.TelegramBotConfig;
 import ar.edu.unsam.ddso.tp.bot.formatter.TelegramMessageFormatter;
+import ar.edu.unsam.ddso.tp.controller.DisponibilizacionController;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
-import ar.edu.unsam.ddso.tp.service.DisponibilizacionService;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 /** Despachador de comandos y consultas para el bot de Telegram. */
@@ -24,15 +25,15 @@ public class TelegramCommandDispatcher {
     private static final Pattern PATRON_PAGINA = Pattern.compile("(?i)(?:^|\\s)p:(\\d+)(?:\\s|$)");
     private static final Pattern PATRON_TAG = Pattern.compile("(?i)(?:^|\\s)tag:([^\\s]+)(?:\\s|$)");
 
-    private final DisponibilizacionService disponibilizacionService;
+    private final DisponibilizacionController disponibilizacionController;
     private final TelegramMessageFormatter formatter;
     private final TelegramBotConfig botConfig;
 
     public TelegramCommandDispatcher(
-            DisponibilizacionService disponibilizacionService,
+            DisponibilizacionController disponibilizacionController,
             TelegramMessageFormatter formatter,
             TelegramBotConfig botConfig) {
-        this.disponibilizacionService = disponibilizacionService;
+        this.disponibilizacionController = disponibilizacionController;
         this.formatter = formatter;
         this.botConfig = botConfig;
     }
@@ -141,8 +142,10 @@ public class TelegramCommandDispatcher {
                 Sort.by("fechaIngreso").descending());
 
         try {
-            Page<PiezaFisicaResponseDTO> resultado =
-                    disponibilizacionService.buscarPiezas(termino, null, null, tag, pageable);
+            ResponseEntity<Page<PiezaFisicaResponseDTO>> respuestaHttp =
+                    disponibilizacionController.buscarPiezas(termino, null, null, tag, pageable);
+            Page<PiezaFisicaResponseDTO> cuerpo = respuestaHttp != null ? respuestaHttp.getBody() : null;
+            Page<PiezaFisicaResponseDTO> resultado = cuerpo != null ? cuerpo : Page.empty();
             return formatter.formatearResultados(resultado, queryOriginal, paginaHumana);
         } catch (Exception ex) {
             LOG.error("Error al ejecutar busqueda en Telegram con query '{}': {}", queryOriginal, ex.getMessage(), ex);

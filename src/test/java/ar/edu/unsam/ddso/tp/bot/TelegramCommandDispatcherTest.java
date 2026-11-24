@@ -15,7 +15,7 @@ import ar.edu.unsam.ddso.tp.bot.dispatcher.TelegramCommandDispatcher;
 import ar.edu.unsam.ddso.tp.bot.formatter.TelegramMessageFormatter;
 import ar.edu.unsam.ddso.tp.dto.PiezaFisicaResponseDTO;
 import ar.edu.unsam.ddso.tp.model.enums.EstadoPieza;
-import ar.edu.unsam.ddso.tp.service.DisponibilizacionService;
+import ar.edu.unsam.ddso.tp.controller.DisponibilizacionController;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +28,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 @ExtendWith(MockitoExtension.class)
 class TelegramCommandDispatcherTest {
 
     @Mock
-    private DisponibilizacionService disponibilizacionService;
+    private DisponibilizacionController disponibilizacionController;
 
     private TelegramMessageFormatter formatter;
     private TelegramBotConfig botConfig;
@@ -44,7 +45,7 @@ class TelegramCommandDispatcherTest {
         formatter = new TelegramMessageFormatter();
         botConfig = new TelegramBotConfig();
         botConfig.setUsername("archivo_digital_bot");
-        dispatcher = new TelegramCommandDispatcher(disponibilizacionService, formatter, botConfig);
+        dispatcher = new TelegramCommandDispatcher(disponibilizacionController, formatter, botConfig);
     }
 
     @Test
@@ -78,7 +79,7 @@ class TelegramCommandDispatcherTest {
     }
 
     @Test
-    void procesarMensaje_buscarConTermino_llamaDisponibilizacionYRetornaResultados() {
+    void procesarMensaje_buscarConTermino_llamaControllerDisponibilizacionYRetornaResultados() {
         // Dado
         PiezaFisicaResponseDTO pieza =
                 new PiezaFisicaResponseDTO(
@@ -87,8 +88,8 @@ class TelegramCommandDispatcherTest {
         Page<PiezaFisicaResponseDTO> page =
                 new PageImpl<>(List.of(pieza), PageRequest.of(0, 5), 1);
 
-        when(disponibilizacionService.buscarPiezas(eq("acta"), isNull(), isNull(), isNull(), any(Pageable.class)))
-                .thenReturn(page);
+        when(disponibilizacionController.buscarPiezas(eq("acta"), isNull(), isNull(), isNull(), any(Pageable.class)))
+                .thenReturn(ResponseEntity.ok(page));
 
         // Cuando
         String respuesta = dispatcher.procesarMensaje(123L, "/buscar acta");
@@ -97,16 +98,17 @@ class TelegramCommandDispatcherTest {
         assertNotNull(respuesta);
         assertTrue(respuesta.contains("Acta de Fundacion"));
         assertTrue(respuesta.contains("INV-001"));
-        verify(disponibilizacionService)
+        verify(disponibilizacionController)
                 .buscarPiezas(eq("acta"), isNull(), isNull(), isNull(), any(Pageable.class));
     }
 
     @Test
-    void procesarMensaje_buscarConTag_llamaDisponibilizacionConTag() {
+    void procesarMensaje_buscarConTag_llamaControllerDisponibilizacionConTag() {
         // Dado
         Page<PiezaFisicaResponseDTO> page = Page.empty();
-        when(disponibilizacionService.buscarPiezas(isNull(), isNull(), isNull(), eq("FOTOGRAFIA"), any(Pageable.class)))
-                .thenReturn(page);
+        when(disponibilizacionController.buscarPiezas(
+                isNull(), isNull(), isNull(), eq("FOTOGRAFIA"), any(Pageable.class)))
+                .thenReturn(ResponseEntity.ok(page));
 
         // Cuando
         String respuesta = dispatcher.procesarMensaje(123L, "/buscar tag:FOTOGRAFIA");
@@ -114,7 +116,7 @@ class TelegramCommandDispatcherTest {
         // Entonces
         assertNotNull(respuesta);
         assertTrue(respuesta.contains("No se encontraron piezas fisicas"));
-        verify(disponibilizacionService)
+        verify(disponibilizacionController)
                 .buscarPiezas(isNull(), isNull(), isNull(), eq("FOTOGRAFIA"), any(Pageable.class));
     }
 
@@ -123,14 +125,15 @@ class TelegramCommandDispatcherTest {
         // Dado
         ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
         Page<PiezaFisicaResponseDTO> page = Page.empty();
-        when(disponibilizacionService.buscarPiezas(eq("expediente"), isNull(), isNull(), eq("HISTORICO"), any(Pageable.class)))
-                .thenReturn(page);
+        when(disponibilizacionController.buscarPiezas(
+                eq("expediente"), isNull(), isNull(), eq("HISTORICO"), any(Pageable.class)))
+                .thenReturn(ResponseEntity.ok(page));
 
         // Cuando
         dispatcher.procesarMensaje(123L, "/buscar expediente tag:HISTORICO p:3");
 
         // Entonces
-        verify(disponibilizacionService)
+        verify(disponibilizacionController)
                 .buscarPiezas(eq("expediente"), isNull(), isNull(), eq("HISTORICO"), pageableCaptor.capture());
         Pageable capturedPageable = pageableCaptor.getValue();
         assertEquals(2, capturedPageable.getPageNumber()); // Pagina 3 humana = index 2
@@ -178,9 +181,9 @@ class TelegramCommandDispatcherTest {
     }
 
     @Test
-    void procesarMensaje_errorEnServicio_capturaExcepcionYRetornaMensajeError() {
+    void procesarMensaje_errorEnController_capturaExcepcionYRetornaMensajeError() {
         // Dado
-        when(disponibilizacionService.buscarPiezas(eq("error"), isNull(), isNull(), isNull(), any(Pageable.class)))
+        when(disponibilizacionController.buscarPiezas(eq("error"), isNull(), isNull(), isNull(), any(Pageable.class)))
                 .thenThrow(new RuntimeException("Fallo de base de datos"));
 
         // Cuando

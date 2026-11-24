@@ -10,7 +10,9 @@ import ar.edu.unsam.ddso.tp.exception.TagNoEncontradoException;
 import ar.edu.unsam.ddso.tp.model.Digitalizacion;
 import ar.edu.unsam.ddso.tp.model.Tag;
 import ar.edu.unsam.ddso.tp.repository.DigitalizacionRepository;
+import ar.edu.unsam.ddso.tp.model.exceptions.TagInvalidoException;
 import ar.edu.unsam.ddso.tp.repository.TagRepository;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,48 @@ public class CatalogacionService {
 
         Tag guardado = tagRepository.save(tag);
         return aTagResponseDTO(guardado);
+    }
+
+    /**
+     * Renombra un tag existente del catalogo.
+     *
+     * @throws TagNoEncontradoException si no existe un tag con ese id
+     * @throws TagInvalidoException si el nuevo nombre esta en blanco
+     * @throws TagDuplicadoException si otro tag ya usa ese nombre (sin distinguir mayusculas)
+     */
+    @Transactional
+    public TagResponseDTO actualizarTag(Long id, TagCreateRequestDTO request) {
+        Tag tag = tagRepository.findById(id).orElseThrow(() -> new TagNoEncontradoException(id));
+
+        String nuevoNombre = request.nombre() != null ? request.nombre().trim() : null;
+        if (nuevoNombre == null || nuevoNombre.isBlank()) {
+            throw new TagInvalidoException("El nombre del tag es obligatorio");
+        }
+
+        boolean nombreCambio = !nuevoNombre.equalsIgnoreCase(tag.getNombre());
+        if (nombreCambio && tagRepository.existsByNombreIgnoreCase(nuevoNombre)) {
+            throw new TagDuplicadoException(nuevoNombre);
+        }
+
+        tag.setNombre(nuevoNombre);
+        Tag guardado = tagRepository.save(tag);
+        return aTagResponseDTO(guardado);
+    }
+
+    /**
+     * Elimina un tag del catalogo. Antes de borrarlo lo desasocia de todas las digitalizaciones
+     * que lo tengan asignado, para no violar la clave foranea de la tabla intermedia.
+     *
+     * @throws TagNoEncontradoException si no existe un tag con ese id
+     */
+    @Transactional
+    public void eliminarTag(Long id) {
+        Tag tag = tagRepository.findById(id).orElseThrow(() -> new TagNoEncontradoException(id));
+
+        for (Digitalizacion digitalizacion : new ArrayList<>(tag.getDigitalizaciones())) {
+            digitalizacion.desasociarTag(tag);
+        }
+        tagRepository.delete(tag);
     }
 
     @Transactional
